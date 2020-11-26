@@ -115,9 +115,8 @@ public class GUI extends javax.swing.JFrame {
         tokenList = new ArrayList();
         new LexAnalizer(tokenList).analize(txtEditor.getText());
         String consoleResponse = "";
-        System.out.println("exe "+consoleResponse);
         for (int i = 0; i < tokenList.size(); i++) {
-            consoleResponse += tokenList.get(i).toString() + "\n";
+            consoleResponse += tokenList.get(i).toString();
         }
         txtConsole.setText("");
         txtConsole.setText(consoleResponse);
