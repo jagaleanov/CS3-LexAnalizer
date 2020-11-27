@@ -185,10 +185,10 @@ public class LexAnalizer {
                         } else if (Pattern.matches(relRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador relacional simple
                             type = 9;
                             state = 0;
-                        } else if (Pattern.matches(assignRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador relacional simple
+                        } else if (Pattern.matches(assignRegEx, String.valueOf(lexema))) {//si el lexema actual es el operador de asignación
                             type = 10;
                             state = 0;
-                        } else if (Pattern.matches(endSentenceRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador relacional simple
+                        } else if (Pattern.matches(endSentenceRegEx, String.valueOf(lexema))) {//si el lexema actual es el operador de fin de sentencia
                             type = 11;
                             state = 0;
                         } else {
