@@ -155,7 +155,7 @@ public class LexAnalizer {
                             }
                         }
                         break;
-                    case 5:
+                    case 5://puntuación y caracteres especiales
                         type = 6;
                         state = 0;
                         break;
