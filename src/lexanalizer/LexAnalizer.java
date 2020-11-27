@@ -30,7 +30,7 @@ public class LexAnalizer {
 
     //TIPOS
     private final String integerRegEx = "[0-9]+";//entero 
-    private final String rationalRegEx = "[0-9]+([.][0-9]+)?|[.][0-9]+";//racional 
+    private final String rationalRegEx = "([0-9]+([.][0-9]+)?)|[.][0-9]+";//racional 
     private final String stringRegEx = "[\"][^\"]*[\"]";//cadena de texto 
 
     //PALABRAS RESERVADAS
@@ -68,13 +68,13 @@ public class LexAnalizer {
         -1:  Comentarios de línea                   #xxxxxx\n
         0:   Lexema desconocido (error)
         1:   Palabra reservada 
-        2:   Identificador                          empieza con alfabetico y puede contener alfanumérico y _
+        2:   Identificador                          empieza con alfabético y puede contener alfanumérico y _
         3:   Cadena de texto                        "xxxxxxx"
         4:   Número entero
         5:   Número racional                        0.1 (punto separador de miles)
-        6:   Puntuación y caracteres especiales     , {} []
+        6:   Puntuación y caracteres especiales     , { } [ ]
         7:   Operador lógico                        & && | || !
-        8:   Operador aritmético                    + - * / % ^
+        8:   Operador aritmético                    + - * / % ^ ( )
         9:   Operador relacional                    < > <= >= == !=
         10:  Operador de asignación                 =
         11:  Operador de fin de sentencia           ;
