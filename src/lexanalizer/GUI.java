@@ -7,10 +7,6 @@ package lexanalizer;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author jgale
- */
 public class GUI extends javax.swing.JFrame {
 
     ArrayList<Token> tokenList;

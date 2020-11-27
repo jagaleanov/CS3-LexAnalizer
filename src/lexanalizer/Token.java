@@ -1,14 +1,5 @@
 package lexanalizer;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author jgale
- */
 public class Token {
 
     private int id;
@@ -109,7 +100,7 @@ public class Token {
                 + "   Id: " + id + "\n"
                 + "   Lexema: " + lexema + "\n"
                 + "   Tipo: (" + type + ") " + getTypeString() + "\n"
-                + "   Fila:" + row + "\n"
+                + "   Fila: " + row + "\n"
                 + "   Columna: " + col + "\n";
     }
 }
