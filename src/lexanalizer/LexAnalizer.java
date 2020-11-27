@@ -189,7 +189,7 @@ public class LexAnalizer {
                             type = 10;
                             state = 0;
                         } else if (Pattern.matches(endSentenceRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador relacional simple
-                            type = 1;
+                            type = 11;
                             state = 0;
                         } else {
                             type = 0;
