@@ -64,20 +64,20 @@ public class LexAnalizer {
         100: Operadores: lógicos, aritméticos, relacionales, asignación, fin de sentencia 
         
         TOKENS
-        -2:  Comentarios de párrafo
-        -1:  Comentarios de línea
+        -2:  Comentarios de párrafo                 ##xxxxxx##
+        -1:  Comentarios de línea                   # 
         0:   Lexema desconocido (error)
-        1:   Palabra reservada
-        2:   Identificador
-        3:   Cadena de texto
+        1:   Palabra reservada 
+        2:   Identificador                          empieza con alfabetico y puede contener alfanumerico y _
+        3:   Cadena de texto                        "xxxxxxx"
         4:   Número entero
-        5:   Número racional
-        6:   Puntuación y caracteres especiales
-        7:   Operador lógico
-        8:   Operador aritmético
-        9:   Operador relacional
-        10:  Operador de asignación
-        11:  Operador de fin de sentencia
+        5:   Número racional                        0.1 (punto separador de miles)
+        6:   Puntuación y caracteres especiales     , {} []
+        7:   Operador lógico                        & && | || !
+        8:   Operador aritmético                    + - * / % ^
+        9:   Operador relacional                    < > <= >= == !=
+        10:  Operador de asignación                 =
+        11:  Operador de fin de sentencia           ;
          */
         int type = -1000;
         String lexema = "";
