@@ -8,6 +8,7 @@ public class LexAnalizer {
     private ArrayList<Token> tokenList = new ArrayList();
     private int tokenCounter = 0;
 
+    //EXPRESIONES REGULARES
     //GENERALES
     private final String spaceRegEx = "[\\s]+";//espacios: salto de línea, espacio y tabular
     private final String numRegEx = "[0-9.]";//numérico
@@ -19,6 +20,8 @@ public class LexAnalizer {
     private final String stringLimRegEx = "[\"]";//limitador de inicio/fin de cadenas de texto
     private final String endSentenceRegEx = "[;]";//operador de cierre de sentencia
     private final String assignRegEx = "[=]";//operador de asignación
+    private final String commentLimRegEx = "[#]";//limitador de comentarios
+    private final String commentLimParagraphRegEx = "[#]{2}";//limitador de comentarios
     private final String mathRegEx = "[+-/%^()*]";//operadores artiméticos simples
     private final String logicRegEx = "[&|!]";//operadores lógicos simples
     private final String relRegEx = "[<>]";//operadores relacionales simples
@@ -32,6 +35,7 @@ public class LexAnalizer {
     private final String integerRegEx = "[0-9]+";//entero 
     private final String rationalRegEx = "([0-9]+([.][0-9]+)?)|[.][0-9]+";//racional 
     private final String stringRegEx = "[\"][^\"]*[\"]";//cadena de texto 
+    private final String commentParagraphRegEx = "[#]{2}[^[#]{2}]*[#]{2}";//cadena de texto 
 
     //PALABRAS RESERVADAS
     private final String[] reservedWords = {
@@ -54,8 +58,9 @@ public class LexAnalizer {
         /*
         ESTADOS
         0:   Vacio(inicial)
-        -1:  Vacio(final)
-        -2:  Comentario
+        -3:  Vacio(final)
+        -2:  Comentario de párrafo
+        -1:  Comentario de línea
         1:   Espacio
         2:   Identificador
         3:   Número
@@ -64,12 +69,12 @@ public class LexAnalizer {
         100: Operadores: lógicos, aritméticos, relacionales, asignación, fin de sentencia 
         
         TOKENS
-        -2:  Comentarios de párrafo                 ##xxxxxx##
-        -1:  Comentarios de línea                   #xxxxxx\n
+        -2:  Comentario de párrafo                 ##xxx xxx xxx##
+        -1:  Comentario de línea                   #xxx xxx xxx\n
         0:   Lexema desconocido (error)
         1:   Palabra reservada 
         2:   Identificador                          empieza con alfabético y puede contener alfanumérico y _
-        3:   Cadena de texto                        "xxxxxxx"
+        3:   Cadena de texto                        "xxx xxx xxx"
         4:   Número entero
         5:   Número racional                        0.1 (punto separador de miles)
         6:   Puntuación y caracteres especiales     , { } [ ]
@@ -86,10 +91,17 @@ public class LexAnalizer {
 
         for (int i = 0; i < lines.size(); i++) {//por cada línea en el texto
             for (int j = 0; j < lines.get(i).length(); j++) {//por cada caracter en la línea
+                char charBefore;
                 char charActive;
                 char charNext;
 
                 charActive = lines.get(i).charAt(j);
+
+                if (j == 0) {//si es el primer caracter de la línea
+                    charBefore = ' ';//asignar el anterior caracter como espacio para las comparaciones
+                } else {//si NO es el último caracter de la línea
+                    charBefore = lines.get(i).charAt(j - 1);//asignar el anterior caracter de la línea para las comparaciones
+                }
 
                 if (j == lines.get(i).length() - 1) {//si es el último caracter de la línea
                     charNext = ' ';//asignar el siguiente caracter como espacio para las comparaciones
@@ -102,9 +114,29 @@ public class LexAnalizer {
                 }
 
                 switch (state) {
-                    case -2://comentario
+                    case -2://comentario de parrafo
+                        lexema += lines.get(i).charAt(j);
+                        System.out.println("entro a tipo -2");
+                        if (Pattern.matches(commentLimParagraphRegEx, String.valueOf(charBefore) + String.valueOf(charActive)) && lexema.length() > 2) {
+                            if (Pattern.matches(commentParagraphRegEx, String.valueOf(lexema))) {//si la cadena es cualquier cosa encerrada entre caracteres de inicio/fin de comentario
+                                type = -2;
+                                state = 0;
+                            } else {//si es otra cosa
+                                type = 0;
+                                state = 0;
+                            }
+                        }
                         break;
-                    case -1://comentario
+                    case -1://comentario de línea
+                        lexema += lines.get(i).charAt(j);
+                        System.out.println("entro a tipo -1");
+                        if (Pattern.matches(commentLimParagraphRegEx, String.valueOf(charActive) + String.valueOf(charNext))) {
+                            state = -2;
+                            System.out.println("se envia a tipo -2");
+                        } else if (j == lines.get(i).length() - 1) {//si es  el último caracter de la linea
+                            type = -1;
+                            state = 0;
+                        }
                         break;
                     case 1://espacio
                         break;
@@ -216,7 +248,7 @@ public class LexAnalizer {
                         lexema = "";
                         type = -1000;
                     }
-                    state = -1;
+                    state = -3;
                 }
             }
         }
@@ -224,7 +256,9 @@ public class LexAnalizer {
 
     public int getInitialState(char ch) {
         String character = String.valueOf(ch);
-        if (Pattern.matches(spaceRegEx, character)) {
+        if (Pattern.matches(commentLimRegEx, character)) {
+            return -1;//comentario
+        } else if (Pattern.matches(spaceRegEx, character)) {
             return 1;//espacios
         } else if (Pattern.matches(alphaRegEx, character)) {
             return 2;//identificador
