@@ -65,10 +65,10 @@ public class LexAnalizer {
         
         TOKENS
         -2:  Comentarios de párrafo                 ##xxxxxx##
-        -1:  Comentarios de línea                   # 
+        -1:  Comentarios de línea                   #xxxxxx\n
         0:   Lexema desconocido (error)
         1:   Palabra reservada 
-        2:   Identificador                          empieza con alfabetico y puede contener alfanumerico y _
+        2:   Identificador                          empieza con alfabetico y puede contener alfanumérico y _
         3:   Cadena de texto                        "xxxxxxx"
         4:   Número entero
         5:   Número racional                        0.1 (punto separador de miles)
