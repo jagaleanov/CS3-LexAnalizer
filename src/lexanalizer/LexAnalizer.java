@@ -52,7 +52,9 @@ public class LexAnalizer {
         "boolean",
         "int",
         "float",
-        "double"
+        "double",
+        "String",
+        "return"
     };
 
     public LexAnalizer(ArrayList<Token> tokenList) {
@@ -194,6 +196,7 @@ public class LexAnalizer {
                         }
                         break;
                     case 5://puntuación y caracteres especiales
+                        lexema += lines.get(i).charAt(j);
                         type = 6;
                         state = 0;
                         break;
