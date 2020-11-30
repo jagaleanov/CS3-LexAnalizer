@@ -39,14 +39,13 @@ public class LexAnalizer {
 
     //PALABRAS RESERVADAS
     private final String[] reservedWords = {
-        "VERDADERO", //true
-        "FALSO", //false
-        "MIENTRAS", //while
-        "PARA", //for
-        "SI", //if
-        "O_SI", //else if
-        "SI_NO_ENTONCES", //else
-        "PARE" //break
+        "true", //true
+        "false", //false
+        "while", //while
+        "for", //for
+        "if", //if
+        "else", //else
+        "break" //break
     };
 
     public LexAnalizer(ArrayList<Token> tokenList) {
