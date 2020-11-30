@@ -12,8 +12,8 @@ public class LexAnalizer {
     //GENERALES
     private final String spaceRegEx = "[\\s]+";//espacios: salto de línea, espacio y tabular
     private final String numRegEx = "[0-9.]";//numérico
-    private final String alphaRegEx = "[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ]";//alfabético
-    private final String alphanumRegEx = "[a-zA-ZááéíóúüñÁÉÍÓÚÜÑ0-9_]";//alfanumérico
+    private final String alphaRegEx = "[a-zA-Z]";//alfabético
+    private final String alphanumRegEx = "[a-zA-Z0-9_]";//alfanumérico
 
     //OPERADORES
     //Operadores de un caracter (simple)
@@ -25,7 +25,7 @@ public class LexAnalizer {
     private final String mathRegEx = "[+-/%^()*]";//operadores artiméticos simples
     private final String logicRegEx = "[&|!]";//operadores lógicos simples
     private final String relRegEx = "[<>]";//operadores relacionales simples
-    private final String specialRegEx = "[.,{}\\[\\]]";//signos de puntuación y caracteres especiales
+    private final String specialRegEx = "[,{}\\[\\]]";//signos de puntuación y caracteres especiales
     //Operadores de dos caracteres (comp)
     private final String mathCompRegEx = "([+-][=])|([+][+])|([-][-])";//operadores artiméticos compuestos +=,-=,++,--
     private final String logicCompRegEx = "([&][&])|([|][|])";//operadores lógicos compuestos &&,||
