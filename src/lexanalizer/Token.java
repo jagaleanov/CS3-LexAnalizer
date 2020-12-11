@@ -58,32 +58,34 @@ public class Token {
 
     public String getTypeString() {
         switch (type) {
+            case -3:
+                return "Comentario de párrafo";
             case -2:
-                return "Comentarios de párrafo";
+                return "Comentario de línea";
             case -1:
-                return "Comentarios de línea";
+                return "Espacio";
             case 1:
                 return "Palabra reservada";
             case 2:
                 return "Identificador";
             case 3:
-                return "Cadena de texto";
+                return "Número";
             case 4:
-                return "Número entero";
+                return "String";
             case 5:
-                return "Número racional";
+                return "Char";
             case 6:
-                return "Puntuación y caracteres especiales";
+                return "Operador aritmético";
             case 7:
                 return "Operador lógico";
             case 8:
-                return "Operador aritmético";
-            case 9:
                 return "Operador relacional";
-            case 10:
+            case 9:
                 return "Operador de asignación";
+            case 10:
+                return "Cierre de sentencia";
             case 11:
-                return "Operador de fin de sentencia";
+                return "Signos de puntuación y caracteres especiales";
             default:
                 return "Lexema desconocido (error)";
 

@@ -11,50 +11,69 @@ public class LexAnalizer {
     //EXPRESIONES REGULARES
     //GENERALES
     private final String spaceRegEx = "[\\s]+";//espacios: salto de línea, espacio y tabular
-    private final String numRegEx = "[0-9.]";//numérico
+    private final String numRegEx = "[0-9]";//numérico
+    private final String numRealRegEx = "[0-9.]";//numérico Real
     private final String alphaRegEx = "[a-zA-Z]";//alfabético
     private final String alphanumRegEx = "[a-zA-Z0-9_]";//alfanumérico
 
+    //COMENTARIOS
+    private final String commentLineRegEx = "[/][/]";//COMENTARIOS DE LÍNEA
+    private final String commentParagraphRegEx = "[/][*][^[#]{2}]*[*][/]";//COMENTARIOS DE PARRAFO
+
     //OPERADORES
-    //Operadores de un caracter (simple)
-    private final String stringLimRegEx = "[\"]";//limitador de inicio/fin de cadenas de texto
     private final String endSentenceRegEx = "[;]";//operador de cierre de sentencia
     private final String assignRegEx = "[=]";//operador de asignación
-    private final String commentLimRegEx = "[#]";//limitador de comentarios
-    private final String commentLimParagraphRegEx = "[#]{2}";//limitador de comentarios
-    private final String mathRegEx = "[+-/%^()*]";//operadores artiméticos simples
-    private final String logicRegEx = "[&|!]";//operadores lógicos simples
-    private final String relRegEx = "[<>]";//operadores relacionales simples
-    private final String specialRegEx = "[,{}\\[\\]]";//signos de puntuación y caracteres especiales
-    //Operadores de dos caracteres (comp)
-    private final String mathCompRegEx = "([+-][=])|([+][+])|([-][-])";//operadores artiméticos compuestos +=,-=,++,--
-    private final String logicCompRegEx = "([&][&])|([|][|])";//operadores lógicos compuestos &&,||
-    private final String relCompRegEx = "([<>=!][=])";//operadores relacionales compuestos <=,>=,==,!=,
+    private final String mathRegEx = "([+-][=])|([+][+])|([-][-])|[+-/%^()*]";//operadores artiméticos
+    private final String logicRegEx = "([&][&])|([|][|])|[&|!]";//operadores lógicos 
+    private final String relRegEx = "[<>=!][=]|[<>]";//operadores relacionales 
+    private final String chainRegEx = "[/][*]|[*][/]|[\"']";//apertura y cierre de cadenas
+    private final String specialRegEx = "[.,{}\\[\\]]";//signos de puntuación y caracteres especiales
 
     //TIPOS
-    private final String integerRegEx = "[0-9]+";//entero 
-    private final String rationalRegEx = "([0-9]+([.][0-9]+)?)|[.][0-9]+";//racional 
+    private final String realRegEx = "([0-9]+([.][0-9]+)?)";//racional 
     private final String stringRegEx = "[\"][^\"]*[\"]";//cadena de texto 
-    private final String commentParagraphRegEx = "[#]{2}[^[#]{2}]*[#]{2}";//cadena de texto 
+    private final String charRegEx = "[\'][^\']{1}[\']";//caracter 
 
     //PALABRAS RESERVADAS
-    private final String[] reservedWords = {
-        "true",
+    private final String[] keyWords = {
+        "abstract",
+        "boolean",
+        "break",
+        "case",
+        "char",
+        "class",
+        "continue",
+        "default",
+        "do",
+        "double",
+        "else",
+        "extends",
         "false",
-        "while",
+        "final",
+        "float",
         "for",
         "if",
-        "else",
-        "class",
-        "interface",
-        "extends",
         "implements",
-        "boolean",
         "int",
-        "float",
-        "double",
+        "interface",
+        "long",
+        "new",
+        "package",
+        "private",
+        "protected",
+        "public",
+        "return",
+        "short",
+        "static",
         "String",
-        "return"
+        "super",
+        "switch",
+        "this",
+        "throw",
+        "true",
+        "try",
+        "void",
+        "while"
     };
 
     public LexAnalizer(ArrayList<Token> tokenList) {
@@ -66,36 +85,30 @@ public class LexAnalizer {
         /*
         ESTADOS
         0:   Vacio(inicial)
-        -3:  Vacio(final)
-        -2:  Comentario de párrafo
-        -1:  Comentario de línea
-        1:   Espacio
-        2:   Identificador
-        3:   Número
-        4:   Cadena de texto
-        5:   Puntuación y caracteres especiales
-        100: Operadores: lógicos, aritméticos, relacionales, asignación, fin de sentencia 
+        -100:  Vacio(final)
+        otro:  procesando lexema 
         
         TOKENS
-        -2:  Comentario de párrafo                 ##xxx xxx xxx##
-        -1:  Comentario de línea                   #xxx xxx xxx\n
+        -3:  Comentario de párrafo                          /*xxx...
+        -2:  Comentario de línea                            //xxx xxx xxx##
+        -1:  Espacio                            
         0:   Lexema desconocido (error)
         1:   Palabra reservada 
-        2:   Identificador                          empieza con alfabético y puede contener alfanumérico y _
-        3:   Cadena de texto                        "xxx xxx xxx"
-        4:   Número entero
-        5:   Número racional                        0.1 (punto separador de miles)
-        6:   Puntuación y caracteres especiales     , { } [ ]
-        7:   Operador lógico                        & && | || !
-        8:   Operador aritmético                    + - * / % ^ ( )
-        9:   Operador relacional                    < > <= >= == !=
-        10:  Operador de asignación                 =
-        11:  Operador de fin de sentencia           ;
+        2:   Identificador                                  empieza con alfabético y puede contener alfanumérico y _
+        3:   Número                                         123.123 ó 123
+        4:   String                                         "xxx xxx xxx"
+        5:   Char                                           'x'
+        6:   Operador aritmético                            + - * / % ^ ( )
+        7:   Operador lógico                                & && | || !
+        8:   Operador relacional                            < > <= >= == !=
+        9:   Operador de asignación                         =
+        10:  Operador de fin de sentencia                   ;
+        11:  Signos de puntuación y caracteres especiales   . , { } [ ]
          */
         int type = -1000;
         String lexema = "";
 
-        ArrayList<String> lines = separateLines(string, '\n');//separa el texto por líneas en un arrayList
+        ArrayList<String> lines = separateLines(string);//separa el texto por líneas en un arrayList
 
         for (int i = 0; i < lines.size(); i++) {//por cada línea en el texto
             for (int j = 0; j < lines.get(i).length(); j++) {//por cada caracter en la línea
@@ -122,38 +135,21 @@ public class LexAnalizer {
                 }
 
                 switch (state) {
-                    case -2://comentario de parrafo
+                    case -2://comntario linea
                         lexema += lines.get(i).charAt(j);
-                        System.out.println("entro a tipo -2");
-                        if (Pattern.matches(commentLimParagraphRegEx, String.valueOf(charBefore) + String.valueOf(charActive)) && lexema.length() > 2) {
-                            if (Pattern.matches(commentParagraphRegEx, String.valueOf(lexema))) {//si la cadena es cualquier cosa encerrada entre caracteres de inicio/fin de comentario
-                                type = -2;
-                                state = 0;
-                            } else {//si es otra cosa
-                                type = 0;
-                                state = 0;
-                            }
-                        }
-                        break;
-                    case -1://comentario de línea
-                        lexema += lines.get(i).charAt(j);
-                        System.out.println("entro a tipo -1");
-                        if (Pattern.matches(commentLimParagraphRegEx, String.valueOf(charActive) + String.valueOf(charNext))) {
-                            state = -2;
-                            System.out.println("se envia a tipo -2");
-                        } else if (j == lines.get(i).length() - 1) {//si es  el último caracter de la linea
-                            type = -1;
+                        if (j == lines.get(i).length() - 1) {//si es  el último caracter de la linea
+                            type = -2;
                             state = 0;
                         }
                         break;
-                    case 1://espacio
+                    case -1://espacio
                         break;
-                    case 2://identificador (inicia con alfabético)
+                    case 1://identificador (inicia con alfabético)
                         lexema += lines.get(i).charAt(j);
                         if (!Pattern.matches(alphanumRegEx, String.valueOf(charNext))) {//si el siguiente caracter no es alfanumérico
                             boolean assigned = false;
-                            for (int k = 0; k < reservedWords.length; k++) {//por cada palbra reservada
-                                if (String.valueOf(reservedWords[k]).equals(String.valueOf(lexema))) {//checkear si el lexema es palbra reservada
+                            for (int k = 0; k < keyWords.length; k++) {//por cada palbra reservada
+                                if (String.valueOf(keyWords[k]).equals(String.valueOf(lexema))) {//checkear si el lexema es palbra reservada
                                     type = 1;
                                     state = 0;
                                     assigned = true;
@@ -170,12 +166,9 @@ public class LexAnalizer {
                     case 3://número
                         lexema += lines.get(i).charAt(j);
 
-                        if (!Pattern.matches(numRegEx, String.valueOf(charNext))) {//si el siguiente caracter no es número o separador decimal
-                            if (Pattern.matches(integerRegEx, String.valueOf(lexema))) {//si el lexema es un entero
-                                type = 4;
-                                state = 0;
-                            } else if (Pattern.matches(rationalRegEx, String.valueOf(lexema))) {//si el lexema es un racional
-                                type = 5;
+                        if (!Pattern.matches(numRealRegEx, String.valueOf(charNext))) {//si el siguiente caracter no es número o separador decimal
+                            if (Pattern.matches(realRegEx, String.valueOf(lexema))) {//si el lexema es un entero
+                                type = 3;
                                 state = 0;
                             } else {//si el lexema es otra cosa
                                 type = 0;
@@ -183,11 +176,17 @@ public class LexAnalizer {
                             }
                         }
                         break;
-                    case 4://cadena de texto
+                    case 4://chains
                         lexema += lines.get(i).charAt(j);
-                        if (Pattern.matches(stringLimRegEx, String.valueOf(charActive)) && lexema.length() > 1) {//si no es el primer caracter del lexema y coincide con el caracter de inicio/fin de cadena
-                            if (Pattern.matches(stringRegEx, String.valueOf(lexema))) {//si la cadena es cualquier cosa encerrada entre caracteres de inicio/fin de cadena
-                                type = 3;
+                        if ((lexema.length() > 3 && Pattern.matches(chainRegEx, String.valueOf(charBefore) + String.valueOf(charActive))) || (lexema.length() > 1 && Pattern.matches(chainRegEx, String.valueOf(charActive)))) {//si no es el primer caracter del lexema y coincide con el caracter de inicio/fin de cadena
+                            if (Pattern.matches(stringRegEx, String.valueOf(lexema))) {//si la cadena es cualquier cosa encerrada entre caracteres de inicio/fin de String
+                                type = 4;
+                                state = 0;
+                            } else if (Pattern.matches(charRegEx, String.valueOf(lexema))) {//si la cadena es cualquier cosa encerrada entre caracteres de inicio/fin de char
+                                type = 5;
+                                state = 0;
+                            } else if (Pattern.matches(commentParagraphRegEx, String.valueOf(lexema))) {//si la cadena es cualquier cosa encerrada entre caracteres de inicio/fin de comantario de parrafo
+                                type = -3;
                                 state = 0;
                             } else {//si es otra cosa
                                 type = 0;
@@ -195,41 +194,35 @@ public class LexAnalizer {
                             }
                         }
                         break;
-                    case 5://puntuación y caracteres especiales
+                    case 6://simbolos
                         lexema += lines.get(i).charAt(j);
-                        type = 6;
-                        state = 0;
-                        break;
-                    case 100://operadores
-                        lexema += lines.get(i).charAt(j);
-                        if (Pattern.matches(logicCompRegEx, String.valueOf(charActive) + String.valueOf(charNext))) {//si junto al siguiente caracter forman un operador lógico compuesto
-                            state = 100;
-                        } else if (Pattern.matches(mathCompRegEx, String.valueOf(charActive) + String.valueOf(charNext))) {//si junto al siguiente caracter forman un operador aritmético compuesto
-                            state = 100;
-                        } else if (Pattern.matches(relCompRegEx, String.valueOf(charActive) + String.valueOf(charNext))) {//si junto al siguiente caracter forman un operador relacional compuesto
-                            state = 100;
-                        } else if (Pattern.matches(logicCompRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador lógico compuesto
+
+                        if (Pattern.matches(mathRegEx, String.valueOf(charActive) + String.valueOf(charNext))) {//si junto al siguiente caracter forman un operador aritmético compuesto
+                            //state = 6;
+                        } else if (Pattern.matches(logicRegEx, String.valueOf(charActive) + String.valueOf(charNext))) {//si junto al siguiente caracter forman un operador lógico compuesto
+                            //state = 6;
+                        } else if (Pattern.matches(relRegEx, String.valueOf(charActive) + String.valueOf(charNext))) {//si junto al siguiente caracter forman un operador relacional compuesto
+                            //state = 6
+                        } else if (Pattern.matches(commentLineRegEx, String.valueOf(charActive) + String.valueOf(charNext))) {//si junto al siguiente caracter forman un inicio de comentario de línea
+                            state = -2;
+                        } else if (Pattern.matches(chainRegEx, String.valueOf(charActive) + String.valueOf(charNext))) {//si junto al siguiente caracter forman un inicio de cadena
+                            state = 4;
+                        } else if (Pattern.matches(mathRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador aritmético 
+                            type = 6;
+                            state = 0;
+                        } else if (Pattern.matches(logicRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador lógivo 
                             type = 7;
                             state = 0;
-                        } else if (Pattern.matches(mathCompRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador aritmético compuesto
+                        } else if (Pattern.matches(relRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador relacional 
                             type = 8;
-                            state = 0;
-                        } else if (Pattern.matches(relCompRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador relacional compuesto
-                            type = 9;
-                            state = 0;
-                        } else if (Pattern.matches(logicRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador lógico simple
-                            type = 7;
-                            state = 0;
-                        } else if (Pattern.matches(mathRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador aritmético simple
-                            type = 8;
-                            state = 0;
-                        } else if (Pattern.matches(relRegEx, String.valueOf(lexema))) {//si el lexema actual forma un operador relacional simple
-                            type = 9;
                             state = 0;
                         } else if (Pattern.matches(assignRegEx, String.valueOf(lexema))) {//si el lexema actual es el operador de asignación
-                            type = 10;
+                            type = 9;
                             state = 0;
                         } else if (Pattern.matches(endSentenceRegEx, String.valueOf(lexema))) {//si el lexema actual es el operador de fin de sentencia
+                            type = 10;
+                            state = 0;
+                        } else if (Pattern.matches(specialRegEx, String.valueOf(lexema))) {//si el lexema actual es un signo de puntuación o un caracteres especial
                             type = 11;
                             state = 0;
                         } else {
@@ -244,49 +237,30 @@ public class LexAnalizer {
                     tokenList.add(new Token(tokenCounter, lexema, type, i + 1, j + 1));
                     lexema = "";
                     type = -1000;
-                } else if (state == 1) {//si el estado final es 1 el lexema fue un espacio y será ignorado
+                } else if (state == -1) {//si el estado final es 1 el lexema fue un espacio y será ignorado
                     state = 0;
                 }
                 //si el estado final es otro, el lexema aún está incompleto
 
-                if (i == lines.size() - 1 && j == lines.get(i).length() - 1) {//si es el uúltimo caracter del texto
-                    if (state != 0) {//si no esta vacio
+                if (i == lines.size() - 1 && j == lines.get(i).length() - 1) {//si es el último caracter del texto
+                    if (state != 0) {//si el lexma aun no esta completo
                         type = 0;//el lexema no coincide en su totalidad, puede estar incompleto
                         tokenCounter++;
                         tokenList.add(new Token(tokenCounter, lexema, type, i + 1, j + 1));
                         lexema = "";
                         type = -1000;
                     }
-                    state = -3;
+                    state = -100;
                 }
             }
         }
     }
 
-    public int getInitialState(char ch) {
-        String character = String.valueOf(ch);
-        if (Pattern.matches(commentLimRegEx, character)) {
-            return -1;//comentario
-        } else if (Pattern.matches(spaceRegEx, character)) {
-            return 1;//espacios
-        } else if (Pattern.matches(alphaRegEx, character)) {
-            return 2;//identificador
-        } else if (Pattern.matches(numRegEx, character)) {
-            return 3;//número
-        } else if (Pattern.matches(stringLimRegEx, character)) {
-            return 4;//string
-        } else if (Pattern.matches(specialRegEx, character)) {
-            return 5;//puntuación y caracteres especiales
-        } else {
-            return 100;//operadores
-        }
-    }
-
-    public ArrayList<String> separateLines(String text, char separator) {
+    public ArrayList<String> separateLines(String text) {
         String line = "";
         ArrayList<String> chain = new ArrayList<>();
         for (int i = 0; i < text.length(); i++) {//por cada caracter en el texto
-            if (text.charAt(i) != separator) {//si NO coincide con el separador
+            if (text.charAt(i) != '\n') {//si NO coincide con el separador
                 line += String.valueOf(text.charAt(i));//concatenar en la línea
             } else {//de lo contrario
                 chain.add(line);//iniciar una nueva línea
@@ -295,5 +269,20 @@ public class LexAnalizer {
         }
         chain.add(line);
         return chain;
+    }
+
+    public int getInitialState(char ch) {
+        String character = String.valueOf(ch);
+        if (Pattern.matches(spaceRegEx, character)) {
+            return -1;//espacio
+        } else if (Pattern.matches(alphaRegEx, character)) {
+            return 1;//alfabetico
+        } else if (Pattern.matches(numRegEx, character)) {
+            return 3;//número
+        } else if (Pattern.matches(chainRegEx, character)) {
+            return 4;//cadenas (String, char, comentario de parrafo)
+        } else {
+            return 6;//símbolo
+        }
     }
 }
