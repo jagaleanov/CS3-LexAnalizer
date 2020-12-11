@@ -17,8 +17,8 @@ public class LexAnalizer {
     private final String alphanumRegEx = "[a-zA-Z0-9_]";//alfanumérico
 
     //COMENTARIOS
-    private final String commentLineRegEx = "[/][/]";//COMENTARIOS DE LÍNEA
-    private final String commentParagraphRegEx = "[/][*][^[#]{2}]*[*][/]";//COMENTARIOS DE PARRAFO
+    private final String commentLineRegEx = "[/]{2}";//COMENTARIOS DE LÍNEA
+    private final String commentParagraphRegEx = "[/][*].+[*][/]";//COMENTARIOS DE PARRAFO
 
     //OPERADORES
     private final String endSentenceRegEx = "[;]";//operador de cierre de sentencia
